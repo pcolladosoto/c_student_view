@@ -1,0 +1,348 @@
+\documentclass[12pt]{book}
+
+\usepackage{minted}
+
+\begin{document}
+
+\chapter{C data types}
+
+When approaching a new programming language a good thing to get out of the way are the data types that language uses. Data types tell us how we will represent information within our program. As with many other things, each data type will have its positive aspects and some negative ones too. We will generally try to look for a data type that fulfills its mission while having the smaller memory impact in the program as a whole. Imagine having a super fast car when the speed is limited to 120 $\frac{km}{h}$. Your powerful engine will get to those 120 $\frac{km}{h}$ without any problem but a cheaper, less powerful car would at the same speed... and for much less money!
+
+In our case the money is the amount of memory we need, and the car is, you guessed it, the data type we are going to use. But before digging into the data types themselves let's take a look at how a computer represents data.
+
+\section{Data representation}
+
+A computer is nothing more than a digital electronic system, a ver complex one actually. To store infrmation, it relies on digital memory. This memory will only be able to store two states:
+\begin{itemize}
+  \item High Level (Bit = 1)
+  \item Low Level  (Bit = 0)
+\end{itemize}
+
+Even though it is beyond the scope of this book, when talking about a "High Level" we are refereing to a voltage level whose value depends on the digital family used to implement the computer. A "Low Level" is a voltage level whose value is usually 0 $V$.
+
+You might be wondering several things: How can we represent numbers at all?, How can we represent negative numbers?, How can we represent text?, How can we represent decimal numbers? These are indeed very good questions, and we will try to answer them right away!
+\subsection{Positive Numbers}
+
+As computers can only work with two symbols (0 and 1), we have to think of a way of representing natural numbers with them. The relation between the binary and decimal systems is actually easy and intuitive. We can see that  the decimal equivalent of a binary number $abc$ is just: $Decimal_{equivalent} = a·2^2 + b·2^1 + c·2^0$ Representing a decimal number in the binary system consists on carrying out a series of divisions. It shouldn't be hard to find that process online, and while easy, it is very cumbersome to explain. With what we know now, we see that a computer sees $011b$ while we see $1·2 + 1 = 3d$. Note how the leftmost bit (MSB) is a 0 here! It will all make sense after the next section.
+
+\subsection{Negative Numbers}
+
+In order to represent negative numbers we must adopt some kind of criteria, a common rule we will all follow so that no matter who built the computer every pice of software is compatible with every system. This rule is what we call the 2's Complement Numbering System, it is the most widespread system used in computers today. Let's see how 2's Complement works:
+
+Let us imagine we have 3 bits. That is a number like $xxxb$. we can see how we can count from $0d\ (000)$ to $7d\ (111)$. This is what we call the Natural Binary System. It can just represent natural numbers (positive integers). Now, let us only use 2 of the bits we initially had. The positive numbers we can represent now are $0\ (000), 1\ (001), 2\ (010)\ and\ 3\ (011)$. Now we can define the 2's Complement of a Number. Be \textbf{EXTREMELY} careful, as the 2's Complement Numbering System and the 2's Complement of a number are \textbf{NOT} the same thing! The 2's Complement of a number $A$ is: $C_2(A) = \bar{A} + 1$ The key idea here is that $C_2(A) = -A$. We can see that for 3 bits we have the following:
+
+\begin{center}
+\begin{tabular}{|c|c|}
+  \hline
+  Postive (Binary) & 2's Complement Binary \\
+  \hline
+  000 (0) & 111 + 1 = 000 (0) \\
+  001 (1) & 110 + 1 = 111 (-1) \\
+  010 (2) & 101 + 1 = 110 (-2) \\
+  011 (3) & 100 + 1 = 101 (-3) \\
+  100 (4) & 011 + 1 = 100 (-4) \\
+  \hline
+\end{tabular}
+\end{center}
+
+We see how, in 2's Complement $4d = -4d!$ We will assume that those numbers whose MSB (Most Significant Bit) is 1 are negative and thos whose MSB is 0 are psoitive. With this criteria, $100b = -4d$. As you might have seen, the renge of values we can represent are \textbf{NOT} symetric, we have 4 negative numbers and only 3 positive numbers (without including the 0). This shows that the range of values we can represent in 2's Complement with $n$ bits is the range: $[-2^{n-1}, 2^{n-1} - 1]$.
+
+We can see how we have agreed on a set of rules that let us represent negative numbers with just two symbols: 0 and 1.
+
+\subsection{Decimal Numbers} %TODO: Include image in Images folder, include an example
+
+Decimal numbers are represented with what we will call the \textit{Mantissa Format}. Unlike with 2's Comlement representation, in order to represent floating point (i.e decimal) numbers we have to distinguish 3 different parts in our model:
+
+\begin{enumerate}
+  \item Sign
+  \item Exponent
+  \item Fraction
+\end{enumerate}
+
+The resulting value will be: $$Value_{decimal} = sign \cdot fraction_d \cdot 2^{exponent_d - 127_d}$$ Now, as we see in the image, the value of all three elements is encoded in part of the 32 bits we are working with as a binary number. We can interpret the binary number for the exponent (bits [13-30]) in 2 ways: taking bit 23 as the LSB (Leas Signinfican Bit) and bit 30 as the MSB (Most Significant Bit) or bit 30 as the LSB and bit 23 as the MSB. Both interpretations can be correct, so we will need to resort to \textbf{ENDIANNESS} to choose our interpretation. Most implementations will use the \textbf{LITTLE ENDIAN} format where bit 23 is the LSB and bit 30 is the MSB, so that is what we will assume as the default. Finally, as with 2's Complement, we will assume the sign to be negative if bit 31 is set to 1 and positive otherwise.
+
+Even though a little bit more complex, this representation is wuite powerful as we will later see. We should also point out that the \textbf{sizes} of the sign, exponent and fraction we worked with are particularized for \textbf{float}s. The idea is the same for \textbf{double}s and \textbf{long double}s, but the sizes of the above differ.
+
+\subsection{Text}
+
+As we already did in the above example, we will adopt and follow a standard to represent text in our programs. For text, we will use the ASCII (American Standard Code for Information Interchange) Standadrd. The idea behind it is actually very simple: We have a table relating a number with each character we can represent. An example of an ASCII table (Note that the format may vary, but they are all the same! It's a standard after all) would be:
+
+%TODO: Insert an ASCII Tale Image
+
+Note that we distinguish several parts within the ASCII table:
+
+\begin{itemize}
+  \item From 0 to 32 and character 127: Control Characters
+  \item From 33 to 126:  Regular ASCII
+  \item From 128 to 255: Extended ASCII
+\end{itemize}
+
+\subsubsection{Control Characters}
+
+Unlike regular letters, control characters won't print anything to the screen. They are used to control (no surprise) the way text is displayed on screen. Examples are the \textless space\textgreater,\textless newline\textgreater,\textless backspace\textgreater... The ones we will usually see and use in our C source code are:
+
+\begin{center}
+\begin{tabular}{|c|c|}
+  \hline
+  Function & C's Equivalent \\
+  \hline
+  New Line      & \textbackslash{}n \\
+  Horiontal Tab & \textbackslash{}t \\
+  Backspace     & \textbackslash{}b \\
+  Vertical Tab  & \textbackslash{}v \\
+  Null          & \textbackslash{}0 \\
+  \hline
+\end{tabular}
+\end{center}
+
+We will come back to these control characters shortly, when we look at the \textbf{Char} data type.
+
+\subsubsection{Regular ASCII}
+
+Regular ASCII includes the letters we are used to. We should emphasize on the fact that ASCII (and hence, C too) treat 'A' and 'a' as different characters. Capital and lower case letters are \textbf{NOT} the same. What's more, one would normally (at least I do) expect the lower case letters to have a lower associated number than the capital ones, but that is not the case... We advise you to be careful with this subtlety.
+
+\subsubsection{Extended ASCII}
+
+After character number 127 we enter the realm of "weird" symbols. Examples include the EUR symbol, the GBP symbol, amongst others. We include this section here for the sake of completeness, but we won't use these characters in the coming sections as they are not an Standard. For these use cases we use Unicode Standard, which is beyond this book's scope.
+
+We strongly encourage you to never forget that the text we see in our programs are in fact, just numbers! We reached an agreement on wich numbers represent which letters (ASCII Table), but characters will only be numbers. This is in fact what makes text handling an easy task in programming languages.
+
+\section{Basic Data Types}
+
+C hasn't got many Basic Data Types. In fact, it has only got 4. However, these 4 data types can be modified by the means of, you guessed it, modifiers. Let's first take a look at the data types, going from the smallest to the biggest of them:
+
+\subsection{Char}
+\textbf{Chars} are the sallest variable we can use in C. They are only 1 Byte (8 bits) long, so the range of values we can represent with them is rather small. The name of the type (\textbf{Char}) tells us the main use we will give to this type: representing characters. Just like what we said above, even though a \textbf{Char} usually represents a character (like a letter) it is indeed a number! We can use it in arithmetic operations, as a counter...
+
+This type may be modified by the keyboard \textbf{unsigned}. By default in C variables are signed, that is, they can represent both positive and negative integers. Nevertheless, we can precede any type with the \textbf{signed} modifier just to be sure it behaves as expected. The "sign" of a type will directly affect the values it can represent. For \textbf{Char}s these ranges are:
+\begin{itemize}
+  \item $Unsigned\ Char \in [0, 255]$
+  \item $Signed\ Char \in [-128, 127]$
+\end{itemize}
+
+You may have noticed that the \textbf{signed char} (from now on \textbf{char}) can represent values up to 127, exactly the last entry in the Regular ASCII table! Now, if we want to make use of the extended ASCII table we \textbf{MUST} use a \textbf{unsigned char}! That's one of the reasons why Extended ASCII is not our "friend".
+
+Now, how do we "create" a \textbf{Char} in our program? That's a legit question, but let's get some definitions out of the way first:
+
+\subsubsection{Variables} %TODO:Inlcude non-suitable names! {my var, 0mybar..., keywords, special cahracters... [$, ^, .]}
+
+One of the key elements of any program are the \textbf{variables} it relies on. For now we can think of variables as "containers" holding a value. Then, a variable has 3 essential parts: the name of the variable itself, its type and the value it holds. When we talk about data types we are actually talking about \textit{\textbf{variable}} data types. We will see later on that a variable has also got a \textbf{Memory Address} linked to it. We will delve deeper into addresses when we talk about pointers. What we need to know now is that a variable has a name, a value and a type.
+
+%TODO: Insert Variable Diagram
+
+With the above we are ready for our first piece of code (Yay!). We will now declare a variable and then declare and initialize a variable. Declaring is the correct term for the "create" a variable we used earlier. Declaring a variable just creates the "container". Declaring and initializing it creates a "container" and fills it in with a value. Type modifiers have to be specified in variable declaration.
+
+\begin{minted}{c}
+  char example; //Declare the char variable example
+  char ex_value = -1; //Declare and initialize ex_value with number 5
+  signed char ex_value_a = -1; //The same as above
+  unsigned char ung = 5; //A unsigned char
+  unsigned char ung_a = -1; //Tricky initialization: See Annex
+\end{minted}
+
+Remember the ASCII table? C has its own ASCII table "built into it". That way, instead of going ourselves to the ASCII table, looking for the number of the letter we want and writing the number in our code, we can just write the character we want enclosed in single quotes, like: 'A' or 'a'. When C compiles the code it will convert 'A' to 65, and 'a' to 97. These "built-in" symbols will be what we call \textbf{CONSTANTS}. We will get to know them later.
+
+Knowing this, we can define and initialize characters in this way:
+
+\begin{minted}{c}
+  char my_letter = 'P';
+  //The above is exactly the same as:
+  char my_letter = 80;
+\end{minted}
+
+Note how the control characters are treated exactly the same as any other character:
+
+\begin{minted}{c}
+  char newline = '\n';
+  char tab = '\t';
+\end{minted}
+
+We should also note that a declared but un-initialized variable can be assigned a value later on in the source code, it won't be useless! Finally, see how we usually use \textbf{char}s to represent characters because they are the most efficient type for doing so. It is the smallest type capable of "holding" the values we need for refereing to evry character. Nevertheless, don't forget that, as letters are just numbers, we can represent text with other bigger types like the ones we will shortly see.
+
+\subsection{Short}
+
+\textbf{Short}s are variables whose size is 2 Bytes. They are rarely used nowadays, so we will only point out their value range and see how they're declared and initialized:
+
+\begin{itemize}
+  \item $Unsigned\ short \in [0, 65535]$
+  \item $Signed\ short \in [-32768, 32767]$
+\end{itemize}
+
+We can use \textbf{short}s by declarig them like:
+
+\begin{minted}{c}
+  short ex = 3;
+  unsigned short hey = 2;
+\end{minted}
+
+Modifiers are used with them like with every other data type.
+
+%\subsection{Long} TODO: Include it if you feel like it...
+
+
+\subsection{Int}
+
+\textbf{Int}s are maybe the most common type you will see and use when programming. Their size is 4 Bytes, so that makes them have quite large value range. \textbf{Int}s are sometimes referred to as having a wordlength size. This is machine dependent and it should not confuse you. For the sake of completeness we will say that the above statement is true for 32-bit machine architectures, where the width of the data bus is indeed 4 Bytes (32 bits). If you wish to learn more about these subtleties we would encourage you to read a book discussing the basics of digital electroic systems. Now, he ranges an \textbf{int} will be capable to represent are:
+
+\begin{itemize}
+  \item $Unsigned\ int \in [0, 65535]$
+  \item $Signed\ int \in [-32768, 32767]$
+\end{itemize}
+
+As before, declaring and initializing \textbf{int}s is pretty straight forward:
+
+\begin{minted}{c}
+  int my_integer = -4;
+  unsigned int my_new_int = 5;
+  unsigned int bad_assignment = -1; //Tricky assignment... See annex
+\end{minted}
+
+Now, would this next line be correct or not? I encourage you to think about it and, whatever you decide, reason your choice.
+
+\begin{minted}{c}
+  int am_i_corect = 'P';
+\end{minted}
+
+This statement is perfectly correct. If you recall, $'P' = 80$. Then the value of the \textbf{int} am\_i\_corect is exactly that, 80. This motivates us to think of \textbf{int}s as bigger \textbf{char}s, in the sense that the range of an \textbf{int} (as well as its size!) are 4 times those of a \textbf{char}. When we go through the basic functions we will use when coding we will see how to visualize and play with all of these concepts. Let me stress the idea we exposed before once more: Characters are nothing more than numbers, thus they can be represented with \textbf{ANY} data type! We normally use \textbf{char}s because they let us represent the entire ASCII table whilst using the smallest amount of memory possible.
+
+
+\subsection{Float}
+
+\textbf{Float}s will let us enter the realm of Real Numbers ($\Re$), as they will be able to represent decimal (or floating point, hence their name) numbers. Their size is 4 Bytes, just like \textbf{int}s. Then, would you say their value range is larger, smaller or the same as that of \textbf{int}s? If you think about it, we need to have the information of both the integral and the decimal part. It wouldn't be a very wild guess to say that, as we will certainly have less space for the integral part, it's value range will be smaller than that of an \textbf{int}. Even though it may seem as the correct answer it is \textbf{NOT}! \textbf{Float}s us a different internal representation (\textbf{NOT} 2's Complement), so even though the 4 bytes are dedicated to the integral part of the represented number, ther value range is still smaller... This is one of the questions we will frequently ask ourselves when choosing data types: Do I need a decimal number or just an integer? If it's the latter, can I make do with a smaller set of values or do I need a 4 Byte \textbf{int}? As you gain more experience, answering these questions will become more natural.
+
+The range of values of a \textbf{float} are a little bit different. We will show the \textit{Maximum}, \textit{Minimum}, \textit{negative closer to 0} and \textit{positive closer to 0}. Note that, as the format of internal representation of \textbf{float}s is not 2's Complement, we will not distinguish between signed and unsigned types:
+
+\begin{itemize}
+  \item $Positive\ float \in [1.17549 \cdot 10^{-38}, 3.40282 \cdot 10^{38}] + \{0\}$
+  \item $Negative\ float \in [-3.40282 \cdot 10^{38}, -1.17549 \cdot 10^{-38}]$
+  \item $Maximum\ text\ to\ float\ decimal\ postions:\ 6$
+\end{itemize}
+
+The \textbf{CONSTANTS} we used for getting the above limits are:
+
+\begin{itemize}
+  \item \textbf{FLT\_MAX}
+  \item \textbf{FLT\_MIN}
+  \item \textbf{FLT\_DIG}
+\end{itemize}
+
+These belong to the \textit{\textless float.h\textgreater} library. More on them in later chapters! Please note that we will show how to "see" the value of the above \textbf{CONSTANTS} when we get to basic C functions.
+
+Note that, unlike with \textbf{char}s, \textbf{short}s and \textbf{int}s, the ranges of \textbf{float}s are not as standarized. These limits are particular for our setup and you should double check these ranges for your particular target platform in case you inted to get close to the boundaries of \textbf{float}s.
+
+We should point out what we mean by \textit{Maximum text to float decimal positions}. The mantissa representation used by \textbf{float}s uses an internal base of 2 instead of 10. This means that we won't get the same precision we would get if we where using our every day decimal system. The number we are pointing out here refers to the maximum number of decimal positions our number may have so that when converting it to \textbf{float} and back again to "text" it is guaranteed to be the same.
+
+%TODO:Thank Stack Overflow user chux!
+
+Having no difference between signed and unsigned values makes declaration and initialization of these values easier!
+
+\begin{minted}{c}
+  float my_float = 3.1415;
+  float my_other_float = -2.718;
+  //If we print out this float we will get 0.123457, only 6 decimal positions
+  float my_third_float = 0.1234567;
+\end{minted}
+
+\subsection{Double}
+
+Just like \textbf{int}s were bigger \textbf{char}s, we can think of \textbf{double}s as big \textbf{float}s. We see how there is some kind of parallelism between types used to represent integers and types used to represent real numbers. A \textbf{double} occupies 8 bytes, it is a really big type! Just like \textbf{float}s, it uses the Mantissa format for internal representation. We will show the ranges of this type following the format used for \textbf{float}s too:
+
+\begin{itemize}
+  \item $Positive\ double \in [2.22507 \cdot 10^{-308}, 1.79769 \cdot 10^{308}] + \{0\}$
+  \item $Negative\ double \in [-1.79769 \cdot 10^{308}, -2.22507 \cdot 10^{-308}]$
+  \item $Maximum\ text\ to\ double\ decimal\ postions:\ 15$
+\end{itemize}
+
+The \textbf{CONSTANTS} we used for getting the above limits are:
+
+\begin{itemize}
+  \item \textbf{DBL\_MAX}
+  \item \textbf{DBL\_MIN}
+  \item \textbf{DBL\_DIG}
+\end{itemize}
+
+These belong to the \textit{\textless float.h\textgreater} library. More on them in later chapters!
+
+When looking at the \textit{Maximum text to double decimal positions} refer to the explanation given in the \textbf{float} data type. Again, these values are platform specific; you should check them before going close to the limits of said type!
+
+Now that we have seen several declarations and initializations let's take another step forward. You will often find yourself needing more than one variable of a given data type. We can declare and initialize them all in one line like this:
+
+\begin{minted}{c}
+  double a = 0, b = -1, c = 1.01;
+\end{minted}
+
+This way our code is shorter and way more readable than what we would have done before:
+
+\begin{minted}{c}
+  double a = 0;
+  double b = -1;
+  double c = 1.01;
+\end{minted}
+
+\subsection{Long double}
+
+The biggest data type, a \textbf{long double} takes up 16 Bytes of memory. This huge capacity, combined with the mantissa representation yield some limits too large to accurately represent as we did with the other data types. We will just assume that:
+
+\begin{itemize}
+  \item $Long\ Double \in \Re$
+  \item $Maximum\ text\ to\ long\ double\ decimal\ postions:\ 18$
+\end{itemize}
+
+If you fancy the exact limits for the above ranges, please refer to the following \textbf{CONSTANTS}:
+
+\begin{itemize}
+  \item \textbf{LDBL\_MAX}
+  \item \textbf{LDBL\_MIN}
+  \item \textbf{LDBL\_DIG}
+\end{itemize}
+
+These belong to the \textit{\textless float.h\textgreater} library. More on them in later chapters!
+
+Declaring and initializing \textbf{long double}s is just the same as before:
+
+\begin{minted}{c}
+  long double a, b = 2.71828; c = 3.14159;
+\end{minted}
+
+The traditional multiline declaration can be used as well:
+
+\begin{minted}{c}
+  long double a;
+  long double b = 2.71828;
+  long double c = 3.14159;
+\end{minted}
+
+\section{Type Casting}
+
+We have seen a lot of data types, but... Can we change the type of any given variable? If so, what things do we have to be careful with? First things first, it is possible to change the type of a variable through an operation we call \textbf{casting}.
+
+\textbf{Casting} can be done in both ways, that is, we can go from a "bigger" type to a smaller one and viceversa. Casting a "small" type to a bigger one is pretty straight forward. As we have more "room" for the new type we won't loose any information and the value of the casted value will reman as it was. If for example we are casting a \textbf{char} into a \textbf{float} we will see how the decimal part of the new \textbf{float} will be set to 0. Remember that \textbf{char}s are only integers (they have no fractional part).
+
+A cast operation is done by appending the new type we want between parenthesis to the variable we want to cast. The result should be stored in a variable of whose type is the same as the type we are casting to:
+
+\begin{minted}{c}
+  int a;
+  float b;
+  //b = a; -> WRONG!
+  b = (float) a; //Correct!
+\end{minted}
+
+In the 3\textsuperscript{rd} line we see how the assignment between \textit{a} and \textit{b} is not entirely correct. Even though it will most likely work depending on your compiler it is a good practice to always make assignments between variables with the same type!
+
+We saw that casting a variable from a "small" type to a bigger one was a breeze. But... What about the opposite? We should be careful with the possible loss of data we might experience! Imagine the following scenario:
+
+\begin{minted}{c}
+  float a = 3.14;
+  int b;
+  b = (int) a;
+\end{minted}
+
+Think about the value \textit{b} will take for a minute. As we are casting \textit{a} to \textbf{int} we will loose its decial part. Casting does not round the quantity, it just gets rid of the information it cannot hold. Then casting to an \textbf{int} is a way of implemening the mathematical \textit{floor(x)} function, being \textit{floor(x)} the function that returns the integral part of \textit{x} without any rounding. This loss of data would have also taken place even if we hadn't explicitly cast \textit{a} to an \textbf{int}. However, we emphasize again that casting is an easy way to get less headaches when running and debugging our programs.
+
+\section{Conclusions}
+
+We have covered a lot of ground in this chapter. Even though the introduction and discussion of data types may seem dry, they are the building blocks of our programs, so we should have a good grasp of them. We have gone through a lot of subtleties that won't be crucial when analyzing at the programs taht lie ahead, but we decided to include them for completeness.
+
+We wncourage you to continue this journey through C, we are sure you won't regret it and we promise it will get more interesting as we go on!
+
+\end{document}

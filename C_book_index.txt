@@ -1,0 +1,24 @@
+Index
+=====
+	0. Motivation
+	1. History (Ritchie, Bell Labs...)
+	2. Setting (Low Level Languages, Compiled Languages, structured programming, top down model, libraries, better performance, applications)
+	3. Dev environment (Linux & GCC); Undefined behavior!
+	4. C basic data types and variable declarations (Except pointers). Modifiers (const, signed, unsigned...). Type Casting
+	5. C operators and preferences; wacky examples; pointer arithmetics.
+	6. C basic statements (if, while, for, switch...) {Include curious things [Infinite for loop]}
+	7. C program structure (Stack, Heap, Constant Area) and concept of memory address, preprocessor directives, functions and function calls; recursion, <stdio.h>, const and static modifiers!, printf() and format string! Important constants!
+	8. Pointers (Examples with int*)
+	9. Arrays, arrays as pointers and the paper of sizeof(), matrixes
+	10. C strings (Examples with reversing, looking for a char, pointer concept...), <string.h>
+	11. Dynamic memory allocation
+	12. Structs and unions (memory representations)
+	13. File handling
+	14. Data structures
+	15. Sorting methods and algorithms
+	16. Annex:
+		What happens if we assign a negative value to an unsigned char? -> It is reduced by modulo UCHAR_MAX + 1. So uchar a = -1 -> a = 255. 			It loops around!
+		Glossary!
+		Numbering formats: HEX, octal, decimal
+
+NOTE: Emphasize on the concept; C is a very simple language so we can really see under the hood. That's our main goal!
