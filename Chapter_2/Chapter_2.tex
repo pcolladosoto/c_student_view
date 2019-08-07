@@ -1,0 +1,86 @@
+\documentclass[12pt]{book}
+
+\usepackage{minted}
+
+\begin{document}
+
+    \chapter{C Operators and Preference}
+
+        We have already seen the basic building blocks of C: variables and their data types. Now, the question is how we can "play" with them. "Playing" is just being able to combine these elements in meaningful ways.
+
+        I once had a teacher who told me some of the best programmers he knew were not computer scientists, but mathematicians. I believe this chapter shows why that is the case. Mathematicians don't see every number in the same way. Some of them are \textbf{REAL} numbers, some of them are \textbf{Imaginary}, some are just \textbf{INTegers}... and the rules to combine them are sometimes different. See, in math everything has a strict type, the same goes for C!
+
+        The good news is that in C we only have \textbf{REAL} numbers, so the only rules we have to dust off are those of basic arithmetics... for now!
+
+        \section{Basic arithmetic operators}
+
+            As most of the variables we have dealt with are representations of numbers, be it reals or integers, we will first focus on basic arithmetics. We will present a piece of code showing them in action.
+
+            \begin{minted}{c}
+                int a = 3 + 5;  // a = 8
+                int b = 10 - 5; // b = 5
+                int c = 4 * 3;  // c = 12
+                int d = 15 / 5; // d = 3
+            \end{minted}
+
+            We then see what each symbol stands for:
+
+            \begin{itemize}
+                \item Addition: +
+                \item Subtraction: -
+                \item Multiplication: *
+                \item Division: /
+            \end{itemize}
+
+            Let's take it up a notch by combining several operations. This works like everyday math, so give it a try. This may actually sound familiar, as questions like the one below are pretty common on social media \dots
+
+            \begin{minted}{c}
+                int a = 2 + (3 + 1) / 4;     // a = ?
+                int b = (4 + 3 * 2) / 5 * 6; // b = ?
+            \end{minted}
+
+            You may remember how parenthesis alter the priority of the operators with them having the highest precedence. Taking that into account yields: $a = 3; b = 12$.
+
+            \subsection{Truncation}
+
+            Up to this point everything seems to be quite normal. Anybody could know the answers to the above. The avid reader will have noticed how \textbf{EVERY} computation shown above yielded integers. Notice how all the variables storing those results are integers too. This leads to a rather scary question. What would $a$ end up being here?
+
+            \begin{minted}{c}
+                int a = 4.5 + 5;
+            \end{minted}
+
+            You may be tempted to say that $a = 9.5$. But if $a$ is an integer \dots How can it hold a decimal number? The short answer is that it cannot and so it will drop the entire decimal part. Thus, $a = 9$. This phenomena is what we know as \textbf{truncation}.
+
+            Imagine you had a giant pot of ramen (japanese noodles) but your bowls are much smaller. You would be forced to only serve as much as you can in the bowls, but that would't be all the delicious ramen you have cooked. You would then be truncating the big pot to your bowl's size.
+
+            C is doing the same thing under the hood. Your program is forcing the compiler to fit a \textit{float} into an \textit{int}. As this is impossible, the compiler will fit as much as it can, only the integer part.
+
+            \subsection{Looping}
+
+            Time for yet another scary question. What would $a$ and $b$ end up being here:
+
+            \begin{minted}{c}
+                unsigned char a = 256;
+                unsigned char b = 300;
+            \end{minted}
+
+            If you recall from chapter 1, the values of an \textit{unsigned char} are within the $[0, 255]$ interval. Then, what happens when we assign a value outside of said interval? \\
+
+            The short answer is that what we are assigning is not the value $x$ we provide, but $x\ \% \ 256$ in this case. Here, \% stands for modulo. We will see it later on in this same chapter, so don't worry too much about it. \\
+
+            In chapter 1 we said that an \textit{unsigned char} is 1 byte long. Talking now "in" hex numbers we see that comprehends the interval $[0x0, 0xFF]$. If you don't feel comfortable enough with hex numbers please refer to the annex. \\
+
+            Think of the compiler as "only looking at this last byte", the only one it cares about. Now, what is the hex notation of $256$? That would be $0x100$. What is the last byte (LSByte) now? That's right, its a good ol' $0$! \\
+
+            If we assign $256$ to an \textit{unsigned char} we will then be "looping" through all the possible numbers and begin from the beginning once more. This is sometimes regarded as "overflowing" the variable. We assigned a value that's too large for it \dots The compiler will ususally warn you about this situation, so try to keep an eye out for it. \\
+
+            What would $b$ be in the end? Following the same logic we can see how: $300 = 256 + 44$, so we will overflow $b$ once and have a $44$ remaining. Hence, $b = 44$! \\
+
+            Another way to look at it is to see how $300 = 0x12C$. The third digit in the hex number is $1$, we have "provoked" one overflow. The remaining number is $0x2C$, which happens to be, no surprise, $44$! \\
+
+            Finally, even though we haven't seen the modulo operation yet, you should "believe" that $300 \% 256$ is indeed $44$.
+
+
+
+
+\end{document}

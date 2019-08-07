@@ -114,7 +114,7 @@ C hasn't got many Basic Data Types. In fact, it has only got 4. However, these 4
 \subsection{Char}
 \textbf{Chars} are the sallest variable we can use in C. They are only 1 Byte (8 bits) long, so the range of values we can represent with them is rather small. The name of the type (\textbf{Char}) tells us the main use we will give to this type: representing characters. Just like what we said above, even though a \textbf{Char} usually represents a character (like a letter) it is indeed a number! We can use it in arithmetic operations, as a counter...
 
-This type may be modified by the keyboard \textbf{unsigned}. By default in C variables are signed, that is, they can represent both positive and negative integers. Nevertheless, we can precede any type with the \textbf{signed} modifier just to be sure it behaves as expected. The "sign" of a type will directly affect the values it can represent. For \textbf{Char}s these ranges are:
+This type may be modified by the keyword \textbf{unsigned}. By default in C variables are signed, that is, they can represent both positive and negative integers. Nevertheless, we can precede any type with the \textbf{signed} modifier just to be sure it behaves as expected. The "sign" of a type will directly affect the values it can represent. For \textbf{Char}s these ranges are:
 \begin{itemize}
   \item $Unsigned\ Char \in [0, 255]$
   \item $Signed\ Char \in [-128, 127]$
@@ -142,6 +142,8 @@ With the above we are ready for our first piece of code (Yay!). We will now decl
 
 Remember the ASCII table? C has its own ASCII table "built into it". That way, instead of going ourselves to the ASCII table, looking for the number of the letter we want and writing the number in our code, we can just write the character we want enclosed in single quotes, like: 'A' or 'a'. When C compiles the code it will convert 'A' to 65, and 'a' to 97. These "built-in" symbols will be what we call \textbf{CONSTANTS}. We will get to know them later.
 
+The idea that should prevail is that a character \textbf{IS} a number. The only difference is how you interpret them. If you ask the program to show you the number as a chaacter it will do so, but if you ask it to show it like a number you will see another representation of the same piece of information. This is somewhat similar to what we would think when dealing with dates. The number $3131999$ can also be regarded as a date: $31/3/1999$. What's more, a number like $3123433230$ could be seen as a date too: $312/343/3230$. The thing is that it doesn't make any sense \dots. This can happen also happen if we try to represent $1571$ as a character. The thing is, C will "loop" these numbers to give meaningful answers. To see more on looping go to the second chapter.
+
 Knowing this, we can define and initialize characters in this way:
 
 \begin{minted}{c}
@@ -157,7 +159,7 @@ Note how the control characters are treated exactly the same as any other charac
   char tab = '\t';
 \end{minted}
 
-We should also note that a declared but un-initialized variable can be assigned a value later on in the source code, it won't be useless! Finally, see how we usually use \textbf{char}s to represent characters because they are the most efficient type for doing so. It is the smallest type capable of "holding" the values we need for refereing to evry character. Nevertheless, don't forget that, as letters are just numbers, we can represent text with other bigger types like the ones we will shortly see.
+We should also point out that a declared but un-initialized variable can be assigned a value later on in the source code, it won't be useless! Finally, see how we usually use \textbf{char}s to represent characters because they are the most efficient type for doing so. It is the smallest type capable of "holding" the values we need for refereing to evry character. Nevertheless, don't forget that, as letters are just numbers, we can represent text with other bigger types like the ones we will shortly see.
 
 \subsection{Short}
 
