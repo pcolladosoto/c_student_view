@@ -1,0 +1,3 @@
+On Macros vs functions:
+    Macros:
+        They just replace the macro name with the code inside whilst substituting the parameter for the given values. Thus, code gets larger than what we see in the editor. We are copying the same piece of code again and again. We avoid function calls so the code is theoretically faster, but we have no error checking... They are becoming deprecated.
