@@ -128,7 +128,7 @@
                 --d; // d = 5
               \end{minted}
 
-              If you are wandering why we placed the "++" and the "--" both before and after the variable name don't you worry. It has to do with operator precedence and we are going to close the chapter with that topic.
+              If you are wandering why we placed the "++" and the "--" both before and after the variable name don't you worry. It has to do with operator precedence and we are going to close the chapter with that topic. We would like to point out that the C++ received the name from this operator. As C++ is seen as an improvement on C its creator decided to call it C++, which literally translates into "C plus one". Whou would have though?
 
             \subsection{The modulo operator}
               You might remember we talked about the \textit{modulo} operator when discussing overflow. This operator \textit{returns} the remainder of the division of its operands and is denoted with the percentaje sign \%. An example will clarify it right away:
@@ -151,6 +151,59 @@
               \end{minted}
 
               And now, what is this used for? If you examine the first "program" we have written you will see tht performing a modulo operation with a value $x$ will yield results in the range $[0,\ x - 1]$. This is in fact the same principle we saw with overflowing, the only thing is that instead of overflowing due to the size limitiations of our data type we are "setting" an overflow threshold with our second operand. Remember how we told you that when assigning a value $x$ to an \textit{unsigned char} we were actually assigning the value $x\ \%\ 256$? This module is imposed by the finite space we have for assigning this piece of information. Modules are commonly employed when looping thorugh an array with a counter that's always increasing for example. You can come back to this line after we touch on arrays.
+
+            \subsection{Bit Level Operators}
+              If there is one thing to be clear on is that C is not a high level language. It "is" if you comparing with assembly (asm), but when putting it up against others like Java or Python we can clearly see we are in another context. This situation will make C a common language when developing hardware and so we need to be able to manipulate bits in an easy and syntactically efficient manner. This is where what we will call the "bit level operators" come in.
+
+              \subsection{Shifting operator}
+                Shifting is rather a common operation when dealing with binary numbers. You may state that every number we work with is acctually represented in binary, it's what computers understand. The thing is that in digital electronic systems, for example, the I/O ports are actually 32-bit numbers where each bit controls an specific input. Handling these values with decimal arithmetic would be a nasty nightmare, so we instead handle them with hex numbers. When we have the "binary mindset" of an electronics person we like to talk about shifting bits rather than multiplying or dividing them. We are going to show that shifting right or left and multiplying or dividing a number by $2$, respectively, are essentially the same thing.
+
+                As we have seen in the appendix, the value of a natural binary number is given by:
+
+                $$\sum_{i = 0}^{n - 1} bit_i \cdot 2^{i}$$
+
+                Notice how $n$ is our number of bits. We are going to deal with small numbers so that we don't get lost in the binary jungle \dots Let our binary number $X_b$ have $4$ bits. We can see how $X$ will be in the range $[0000,\ 1111]_b = [0, 15]_d$. Now, what shifting does is it moves each bit to the right or left and introduces $0$s either in the LSBs if shifting left or in the MSBs if shifting right.
+
+                Let's see what a shift looks like on our guinea pig of a number. If we shift $X$ two positions to the left we would have the following. Please note that the final sub-index symbolizes the "step" of the procedure: $X_0 = 0010;\ X_1 = 0100;\ X_2 = 1000$. The values of the initial and final values would then be:
+
+                $$Value(X_0) = \sum_{i = 0}^{4 - 1} bit_i \cdot 2^{i} = 0 \cdot (2^{0} + 2^{2} + 2^{3}) + 1 \cdot 2^{1} = 2$$
+                $$Value(X_2) = \sum_{i = 0}^{4 - 1} bit_i \cdot 2^{i} = 0 \cdot (2^{0} + 2^{1} + 2^{2}) + 1 \cdot 2^{3} = 8$$
+
+                Now, notice that:
+
+                $$Value(X_2) = 2^{2} \cdot Value(X_0) = 2^{2} \cdot 1 \cdot 2^{1} = 2^{2 + 1} = 2^3$$
+
+                We can also see that if we had decided to shift three positions to the left we would have needed a fifth digit. This would have provoked an overflow because the number we where intending to represent wouldn't fit in the $4$ available bits we have...
+
+                The idea is the same for right shifting, the only thing is that we will now be dividing by $2$ with each position we shift. Let's go through an example. Take $X = 0100$ and shift it to the right twice. You will get $X_0 = 0100;\ X_1 = 0010;\ X_2 = 0001$. We can also show, just like we did before, that for right shifting the following holds: $Value(X_2) = 2^{-2} \cdot Value(X_0)$. Please remember that $\alpha \cdot 2^{-n} = \frac{\alpha}{2^n}$.
+
+                Now, if we had shifted $4$ positions we would have experienced truncation too. Imagine we had $X = 1_b = 1_d$. If we shift it right once we see that it is equivalent to dividing it by $2$ and $1_d / 2 = 0,5$... We are dealing with \textbf{INT}egers, so we have no way of keeping track of that decimal part. Thus, the result of that operation would be $0$. This is why shifting $X = 1000$ $4$ times to the right would yield $X = 0_d$ instead of $X = 0,5_d$ \dots
+
+                Don't worry if the above is a little bit fuzzy... We haveincluded it for the sake of completeness, but this will not usually be deat with in our "academic" context.
+
+                Okay, enough maths for today. How do we represent a shifting operation in C? The operators are "<<" and ">>" for a left and right shift respectively. An example of them in action would be:
+
+                \begin{minted}{c}
+                  int a = 0x4; // Binary number 0..0001
+                  int b = a << 2; // b = 4 * 2^2 = 16 (It fits in an int!)
+                  int c = a >> 2; // c = 4 * 2^(-2) = 1
+                  int d = a >> 3; // d = 0... We have truncated the value!
+                \end{minted}
+
+                We can also use the shorthand notation:
+
+                \begin{minted}{c}
+                  int a = 0x4;
+                  a <<= 2; //a = 16
+                \end{minted}
+
+                Now that we have dealt with the notation, we can condense the mathematical notation we had before and give two nice expressions:
+
+                $$X << \alpha = X \cdot 2^{\alpha}\ if\ the\ host\ variable\ is\ big\ enough$$
+                $$X >> \alpha = \frac{X}{2^\alpha}\ if\ we\ have\ no\ truncation$$
+
+              \subsection{Bitwise logical operations}
+
 
 
 
