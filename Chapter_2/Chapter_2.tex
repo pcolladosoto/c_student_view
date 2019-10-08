@@ -8,7 +8,7 @@
 
         We have already seen the basic building blocks of C: variables and their data types. Now, the question is how we can "play" with them. "Playing" is just being able to combine these elements in meaningful ways.
 
-        I once had a teacher who told me some of the best programmers he knew were not computer scientists, but mathematicians. I believe this chapter shows why that is the case. Mathematicians don't see every number in the same way. Some of them are \textbf{REAL} numbers, some of them are \textbf{Imaginary}, some are just \textbf{INTegers}... and the rules to combine them are sometimes different. See, in math everything has a strict type, the same goes for C!
+        I once had a teacher who told me some of the best programmers he knew were not computer scientists, but mathematicians. I believe this chapter shows why that may be the case. Mathematicians don't see every number in the same way. Some of them are \textbf{REAL} numbers, some of them are \textbf{Imaginary}, some are just \textbf{INTegers}... and the rules to combine them are sometimes different. See, in math everything has a strict type. The same goes for C! This is what makes C a \textit{Strongly Typed Language}. Whenever we declare a variable we must declare its type. This may seem cumbersome, but I believe it makes programs way clearer on the long run.
 
         The good news is that in C we only have \textbf{REAL} numbers, so the only rules we have to dust off are those of basic arithmetics... for now!
 
@@ -53,9 +53,11 @@
 
             Imagine you had a giant pot of ramen (japanese noodles) but your bowls are much smaller. You would be forced to only serve as much as you can in the bowls, but that would't be all the delicious ramen you have cooked. You would then be truncating the big pot to your bowl's size.
 
-            C is doing the same thing under the hood. Your program is forcing the compiler to fit a \textit{float} into an \textit{int}. As this is impossible, the compiler will fit as much as it can, only the integer part.
+            C is doing the same thing under the hood. Your program is being forced to fit a \textit{float} into an \textit{int}. As this is impossible, the compiler will fit as much as it can, only the integer part.
 
-            \subsection{Looping}
+            We won't wo any further with this matter here, but you can find an appendix going through the basic numrical representations used in computers. Just to tease your curiosity, think about how we can represent a decimal number when all we have are bits; we don't have a comma (dt for our american readers) anywhere...
+
+            \subsection{Looping, (a.k.a Overflowing)}
 
             Time for yet another scary question. What would $a$ and $b$ end up being here:
 
@@ -68,7 +70,7 @@
 
             The short answer is that what we are assigning is not the value $x$ we provide, but $x\ \% \ 256$ in this case. Here, \% stands for modulo. We will see it later on in this same chapter, so don't worry too much about it. \\
 
-            In chapter 1 we said that an \textit{unsigned char} is 1 byte long. Talking now "in" hex numbers we see that comprehends the interval $[0x0, 0xFF]$. If you don't feel comfortable enough with hex numbers please refer to the annex. \\
+            In chapter 1 we said that an \textit{unsigned char} is 1 byte long. Talking now "in" hex numbers we see that comprehends the interval $[0x0, 0xFF]$. If you don't feel comfortable enough with hex numbers please refer to the annex on numbering systems. \\
 
             Think of the compiler as "only looking at this last byte", the only one it cares about. Now, what is the hex notation of $256$? That would be $0x100$. What is the last byte (LSByte) now? That's right, its a good ol' $0$! \\
 
@@ -76,10 +78,79 @@
 
             What would $b$ be in the end? Following the same logic we can see how: $300 = 256 + 44$, so we will overflow $b$ once and have a $44$ remaining. Hence, $b = 44$! \\
 
-            Another way to look at it is to see how $300 = 0x12C$. The third digit in the hex number is $1$, we have "provoked" one overflow. The remaining number is $0x2C$, which happens to be, no surprise, $44$! \\
+            Another way to look at it is to see how $300 = 0x12C$. The third digit in the hex number is $1$, we have "provoked" $1$ overflow. The remaining number is $0x2C$, which happens to be, no surprise, $44$!. Now, how many overflows will we provoke if the number we try to store in $a$ is $0x30A$. That's correct, $3$. \\
 
             Finally, even though we haven't seen the modulo operation yet, you should "believe" that $300 \% 256$ is indeed $44$.
 
+            Now you may be wandering whether this happens for \textbf{int}s too. The case with this bigger data type is exactly the same. The only thing is that, as \textbf{int}s are $4$ bytes long their possible values are in the range $[0x00000000,\ 0xFFFFFFFF]$. Then again if we try to assign the value $0x10000000A$ to an \textbf{int} we can assure that we have provoked $1$ overflow (look at the LSB) and that the value we will \textit{truncate} it to is $0xA$.
+
+            The last question we may have is wheter this is true for \textbf{float}s as well and the answer is kind of \dots Due to the way real numbers are represented internally we prefer to talk about their "precision" which is fancy for how many decimals can they hold? We will treat this case in the annex as it is more a matter of Computer Architecture than pure programming.
+
+            All in all we can see how dealing with data types that can hold a discrete set of values tends to "muddy" up things a bit... These problems are not that common when dealing with "academic" programming like the one we inted to cover here. It is a matter of importance, however, when programming digital electronic systems that need to take into account the number of edges in a clock signal or when we have to keep track of how may packets are arriving to a given system. This last point is a witness of how fast computational speeds has eveolved. When dealing with a topic known as Network Management one finds that the data we need to manage is described in what we call MIBs. Long story short, one of the entries to the MIB is a counter keep track of the number of TCP segments arriving to a given system. This counter was initially designed in the 90s and the designers though that a $32$-bit variable would be able to keep track of these arrivals during a reasonable amount of time. It turns out that, as the Internet evolved and computers got faster this counter would overflow in roughly an hour. No surprise when we can hit $1$ million incoming segments per second. If you think about the numbers it's crazy... We have about $0xFFFFFFFF$ segments coming to us in such a short window of time... Given this scenario, the designers opted to up the size of the counter to $64$-bits to solve the problem. The bottom line is that even though we will not pay too much attention to this phenoma it's a very common "real world" problem. By the way, you can read up on this in RFC 4022 page $18$.
+
+          \section{The rest of the family: other common C operators}
+            \subsection{Value modification}
+              Now that we have seen some basic arithmetic operations we will see how to "compress" them so that our code is smaller and easier to read. It is quite common when programming to find situations where you have to modify a variable by a given number. That is, you may need to add $5$ to variable $a$ for instance. With what we know we could carry this out with the following code:
+
+              \begin{minted}{c}
+                int a = 0; // We declare the variable
+                a = a + 5; // Now a = 5!
+              \end{minted}
+
+              Now, this code is very \textit{explicit}, that is, it is telling the reader exactly what it does. Now, consider this other version of the program doing exactly the same:
+
+              \begin{minted}{c}
+                int a = 0;
+                a += 5; // a = 5 too!
+              \end{minted}
+
+              This version is the shorthand notation for the one we wrote first. As you might expect, this is applicable to every basic arithmetic operator we have seen. This can be shown with:
+
+              \begin{minted}{c}
+                int a = 10;
+                a -= 5; // a = 5
+                int b = 10;
+                b *= 0.2; // b = 5
+                int c = 10;
+                c /= 2; // c = 5
+              \end{minted}
+
+              All of the above would yield $5$. But wait, there is more. There is one modification that is so common it "got" its own name. That is the increment and decrement by $1$ and can be expressed as:
+
+              \begin{minted}{c}
+                int a = 4;
+                a++; // a = 5
+                int b = 6;
+                b--; // b = 5
+                int c = 4;
+                ++c; // c = 5
+                int d = 6;
+                --d; // d = 5
+              \end{minted}
+
+              If you are wandering why we placed the "++" and the "--" both before and after the variable name don't you worry. It has to do with operator precedence and we are going to close the chapter with that topic.
+
+            \subsection{The modulo operator}
+              You might remember we talked about the \textit{modulo} operator when discussing overflow. This operator \textit{returns} the remainder of the division of its operands and is denoted with the percentaje sign \%. An example will clarify it right away:
+
+              \begin{minted}{c}
+                int a = 5;
+                int b = 5 % a; // b = 0
+                int c = 4 % a; // c = 4
+                int d = 3 % a; // d = 3
+                int e = 2 % a; // e = 2
+                int f = 1 % a; // f = 1
+                int g = 0 % a; // g = 0
+              \end{minted}
+
+              This operation supports the shorthand notation we discussed about earlier too:
+
+              \begin{minted}{c}
+                int a = 10;
+                a %= 15; // a = 10
+              \end{minted}
+
+              And now, what is this used for? If you examine the first "program" we have written you will see tht performing a modulo operation with a value $x$ will yield results in the range $[0,\ x - 1]$. This is in fact the same principle we saw with overflowing, the only thing is that instead of overflowing due to the size limitiations of our data type we are "setting" an overflow threshold with our second operand. Remember how we told you that when assigning a value $x$ to an \textit{unsigned char} we were actually assigning the value $x\ \%\ 256$? This module is imposed by the finite space we have for assigning this piece of information. Modules are commonly employed when looping thorugh an array with a counter that's always increasing for example. You can come back to this line after we touch on arrays.
 
 
 
