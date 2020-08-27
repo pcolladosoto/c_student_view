@@ -1,4 +1,4 @@
-# c_student_view
+# C from a Student's Point of View
 After learning about C I became deeply fond of it because it let you break free of the "chains" imposed by other programming languages. Through this book I will try to get C as close as possible to as many people as I possibly can.
 
 ## Compiling .tex files
